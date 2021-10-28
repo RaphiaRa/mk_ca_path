@@ -49,6 +49,6 @@ do
     fi
     if [ "$line_" = "-----END CERTIFICATE-----" ]; then
         doWrite_=0
-	ln -s $file_ $path_/"$(openssl x509 -hash -noout -in $filepath_)".0
+	    ln -s $file_ $path_/"$(openssl x509 -hash -noout -in $filepath_)".0
     fi
 done < "$input_"
