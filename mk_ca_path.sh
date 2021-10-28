@@ -30,26 +30,25 @@ if ! [ -x "$(command -v openssl)" ]; then
     echo 'Error: openssl not found.' >&2
     exit 1
 fi
-if ! [ -x "$(command -v c_rehash)" ]; then
-    echo 'Error: c_rehash (Part of openssl) not found.' >&2
-    exit 1
-fi
 input_=$bundle_
 count_=0
 doWrite_=0
 file_=""
+filepath_=""
 while IFS= read -r line_
 do
     if [ "$line_" = "-----BEGIN CERTIFICATE-----" ]; then
         doWrite_=1
-        file_="$path_/cert-$count.pem"
-        rm -f $file_ 
+        file_="cert-$count_.pem"
+	filepath_="$path_/$file_"
+        rm -f $filepath_
         count_=$((count_+1))
     fi
     if [ "$doWrite_" == "1" ]; then
-        echo "$line_" >> $file_
+        echo "$line_" >> $filepath_
     fi
-    elif [ "$line_" = "-----END CERTIFICATE-----" ]; then
+    if [ "$line_" = "-----END CERTIFICATE-----" ]; then
         doWrite_=0
+	ln -s $file_ $path_/"$(openssl x509 -hash -noout -in $filepath_)".0
     fi
 done < "$input_"
